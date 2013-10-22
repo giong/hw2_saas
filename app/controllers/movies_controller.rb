@@ -19,14 +19,16 @@ class MoviesController < ApplicationController
     @movies = Movie.all
     @sort = params[:sort]
     #set and retrieve session for sort
-    if @sort.nil?
+    if @sort.nil? && session[:sort]
       @sort = session[:sort]
+      redirec_to movies_path(:sort => @sort, :ratings => @filter_ratings)
     else
       session[:sort] = @sort
     end
     #set or retrieve session for filter
-    if @filter_ratings.nil?
+    if @filter_ratings.nil? && session[:filter_ratings]
       @filter_ratings = session[:filter_ratings]
+      redirect_to movies_path(:sort => @sort, :ratings => @all_ratings)
     else
       session[:filter_ratings] = @filter_ratings
     end
