@@ -16,24 +16,29 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = ['G', 'PG', 'PG-13', 'R']
     @filter_ratings = params[:ratings].keys unless params[:ratings].nil?
-    @movies = Movie.all
     @sort = params[:sort]
-    #set and retrieve session for sort
-    if @sort.nil? && session[:sort]
+    @movies = Movie.all
+    
+    #set or retrieve session for sort
+    #redirect to if lack of sort parameter
+    if params[:sort].nil? && session[:sort]
       @sort = session[:sort]
-      redirec_to movies_path(:sort => @sort, :ratings => @filter_ratings)
+      redirect_to movies_path(:sort => session[:sort], :ratings => params[:ratings])
     else
       session[:sort] = @sort
     end
+    
     #set or retrieve session for filter
-    if @filter_ratings.nil? && session[:filter_ratings]
-      @filter_ratings = session[:filter_ratings]
-      redirect_to movies_path(:sort => @sort, :ratings => @all_ratings)
+    #redirect to if lack of ratings parameter
+    if params[:ratings].nil? && session[:filter_ratings]
+      @filter_ratings = session[:filter_ratings].keys
+      redirect_to movies_path(:sort => session[:sort], :ratings => session[:filter_ratings])
     else
-      session[:filter_ratings] = @filter_ratings
+      session[:filter_ratings] = params[:ratings]
     end
+    
     #filter movie by rating when submit or from session 
-    if params[:commit] == "Refresh" || !session[:filter_ratings].nil?
+    if params[:commit] == "Refresh" || session[:filter_ratings]
       @movies = Movie.find_all_by_rating(@filter_ratings)
     end
     #sort movie by title and release date
