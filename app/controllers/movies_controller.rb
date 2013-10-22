@@ -18,24 +18,27 @@ class MoviesController < ApplicationController
     @filter_ratings = params[:ratings].keys unless params[:ratings].nil?
     @movies = Movie.all
     @sort = params[:sort]
-    
+    #set and retrieve session for sort
     if @sort.nil?
       @sort = session[:sort]
     else
       session[:sort] = @sort
     end
-    
+    #set or retrieve session for filter
     if @filter_ratings.nil?
       @filter_ratings = session[:filter_ratings]
     else
       session[:filter_ratings] = @filter_ratings
     end
+    #filter movie by rating when submit or from session 
+    if params[:commit] == "Refresh" || !session[:filter_ratings].nil?
+      @movies = Movie.find_all_by_rating(@filter_ratings)
+    end
+    #sort movie by title and release date
     if @sort == "title"
       @movies = @movies.sort_by{ |m| m.title }
     elsif @sort == "date" 
       @movies = @movies.sort_by{ |m| m.release_date }
-    elsif params[:commit] == "Refresh" || !session[:filter_ratings].nil?
-      @movies = Movie.find_all_by_rating(@filter_ratings)
     end
   end
 
