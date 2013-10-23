@@ -1,13 +1,6 @@
 class MoviesController < ApplicationController
 
   def show
-    @filter_params = {}
-    unless session[:filter_ratings].nil?
-      session[:filter_ratings].each do |f|
-       @filter_params[f] = 1
-      end
-    end
-    
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
@@ -15,31 +8,37 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = ['G', 'PG', 'PG-13', 'R']
-    @filter_ratings = params[:ratings].keys unless params[:ratings].nil?
+    @filter_ratings = params[:ratings]
     @sort = params[:sort]
     @movies = Movie.all
     
-    #set or retrieve session for sort
-    #redirect to if lack of sort parameter
-    if params[:sort].nil? && session[:sort]
+    #retrieve and set sort from session
+    if @sort.nil?
       @sort = session[:sort]
-      redirect_to movies_path(:sort => session[:sort], :ratings => params[:ratings])
     else
       session[:sort] = @sort
     end
     
-    #set or retrieve session for filter
-    #redirect to if lack of ratings parameter
-    if params[:ratings].nil? && session[:filter_ratings]
-      @filter_ratings = session[:filter_ratings].keys
-      redirect_to movies_path(:sort => session[:sort], :ratings => session[:filter_ratings])
+    #retrieve and set ratings from session
+    if @filter_ratings.nil?
+      @filter_ratings = session[:ratings]
     else
-      session[:filter_ratings] = params[:ratings]
+      session[:ratings] = @filter_ratings
+    end
+    
+    #redirect to if lack of sort parameter
+    if params[:sort].nil? && session[:sort]
+      redirect_to movies_path(:sort => @sort, :ratings => @filter_ratings) and return
+    end
+
+    #redirect to if lack of ratings parameter
+    if params[:ratings].nil? && session[:ratings]
+      redirect_to movies_path(:sort => @sort, :ratings => @filter_ratings) and return
     end
     
     #filter movie by rating when submit or from session 
-    if params[:commit] == "Refresh" || session[:filter_ratings]
-      @movies = Movie.find_all_by_rating(@filter_ratings)
+    if params[:commit] == "Refresh" || session[:ratings]
+      @movies = Movie.find_all_by_rating(@filter_ratings.keys)
     end
     #sort movie by title and release date
     if @sort == "title"
