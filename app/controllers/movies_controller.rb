@@ -37,7 +37,7 @@ class MoviesController < ApplicationController
     end
     
     #filter movie by rating when submit or from session 
-    if params[:commit] == "Refresh" || session[:ratings]
+    if @filter_ratings
       @movies = Movie.find_all_by_rating(@filter_ratings.keys)
     end
     #sort movie by title and release date
