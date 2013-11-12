@@ -3,10 +3,13 @@
   %head
     %title Rotten Potatoes!
     = stylesheet_link_tag 'bootstrap'
+    = stylesheet_link_tag 'application'
     = javascript_include_tag 'bootstrap'
+    = javascript_include_tag 'application'
     = csrf_meta_tags
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   %body
+    render :partial => 'login/login_form'
     %h1.title Rotten Potatoes!
     .container
       - if flash[:notice]

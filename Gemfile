@@ -8,7 +8,7 @@ gem 'rails', '3.2.14'
 # for Heroku deployment - as described in Ap. A of ELLS book
 group :development, :test do
   gem 'sqlite3'
-  gem 'ruby-debug19'
+  gem 'debugger'
 end
 
 group :production do
@@ -26,7 +26,7 @@ end
 
 gem 'jquery-rails'
 gem 'haml'
-
+gem 'omniauth-twitter'
 # Use unicorn as the web server
 # gem 'unicorn'
 
